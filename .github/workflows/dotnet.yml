@@ -1,0 +1,33 @@
+name: .NET
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build:
+    runs-on: windows-2019
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1.0.5
+    - name: setup-msbuild
+      uses: microsoft/setup-msbuild@v1.1
+    - name: Restore Packages
+      run: nuget restore SurfaceManualRotation.sln
+    - name: Build solution
+      run: msbuild SurfaceManualRotation.sln -t:rebuild -property:Configuration=Release
+    - uses: ncipollo/release-action@v1
+      with:
+        artifacts: "D:/a/SurfaceManualRotation/SurfaceManualRotation/bin/Release/SurfaceManualRotation.exe"
+        name: Latest release ( ${{ github.ref }} )
+        tag: ${{ github.ref }}
+        prerelease: false
+        skipIfReleaseExists: false
+        makeLatest: true
+        allowUpdates: true
+        artifactErrorsFailBuild: true
+        
